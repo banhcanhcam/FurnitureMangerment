@@ -1,0 +1,28 @@
+#ifndef PRODUCT_VALIDATION_H
+#define PRODUCT_VALIDATION_H
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <memory>
+#include "FurnitureBase.h"
+
+// Định nghĩa Alias để tái sử dụng code dễ dàng hơn, khớp với kiến trúc FurnitureManager
+using FurnitureList = std::vector<std::shared_ptr<FurnitureBase>>;
+using FurnitureInventory = std::map<MaterialType, FurnitureList>;
+
+// Nhóm kiểm tra trạng thái (Truyền toàn bộ map inventory vào)
+bool isStoreEmpty(const FurnitureInventory& store);
+bool isDuplicateId(const FurnitureInventory& store, const std::string& id);
+
+// Nhóm xử lý nhập liệu an toàn
+std::string getValidString(const std::string& prompt);
+double getValidDimension(const std::string& prompt); // Thay thế Price/Quantity bằng Dimension
+
+// Nhóm thao tác dữ liệu an toàn
+bool safeDelete(FurnitureList& store, int index);
+void updateAndSort(FurnitureList& store);
+bool safeWriteToFile(const std::string& filename, const std::string& data);
+
+#endif

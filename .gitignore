@@ -1,0 +1,9 @@
+# Các file hệ thống và file tạm
+.vscode/
+.git/
+*.exe
+*.o
+*.obj
+*.dev
+*.depend
+*.layout

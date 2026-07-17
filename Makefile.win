@@ -1,0 +1,67 @@
+# Project: cuu t
+# Makefile created by Embarcadero Dev-C++ 6.3
+
+CPP      = g++.exe
+CC       = gcc.exe
+WINDRES  = windres.exe
+OBJ      = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o
+LINKOBJ  = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o
+LIBS     = -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib" -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc -fopenmp -pg
+INCS     = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
+CXXINCS  = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
+BIN      = "cuu t.exe"
+CXXFLAGS = $(CXXINCS) -pg -fopenmp
+CFLAGS   = $(INCS) -pg -fopenmp
+DEL      = C:\Program Files (x86)\Embarcadero\Dev-Cpp\devcpp.exe INTERNAL_DEL
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(BIN) all-after
+
+clean: clean-custom
+	${DEL} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CPP) $(LINKOBJ) -o $(BIN) $(LIBS)
+
+AccountManager.o: AccountManager.cpp
+	$(CPP) -c AccountManager.cpp -o AccountManager.o $(CXXFLAGS)
+
+checkStore.o: checkStore.cpp
+	$(CPP) -c checkStore.cpp -o checkStore.o $(CXXFLAGS)
+
+FurnitureBase.o: FurnitureBase.cpp
+	$(CPP) -c FurnitureBase.cpp -o FurnitureBase.o $(CXXFLAGS)
+
+FurnitureManage.o: FurnitureManage.cpp
+	$(CPP) -c FurnitureManage.cpp -o FurnitureManage.o $(CXXFLAGS)
+
+main.o: main.cpp
+	$(CPP) -c main.cpp -o main.o $(CXXFLAGS)
+
+Order.o: Order.cpp
+	$(CPP) -c Order.cpp -o Order.o $(CXXFLAGS)
+
+OrderManager.o: OrderManager.cpp
+	$(CPP) -c OrderManager.cpp -o OrderManager.o $(CXXFLAGS)
+
+PersistenceManager.o: PersistenceManager.cpp
+	$(CPP) -c PersistenceManager.cpp -o PersistenceManager.o $(CXXFLAGS)
+
+Product.o: Product.cpp
+	$(CPP) -c Product.cpp -o Product.o $(CXXFLAGS)
+
+safeDelete.o: safeDelete.cpp
+	$(CPP) -c safeDelete.cpp -o safeDelete.o $(CXXFLAGS)
+
+safeWriteToFile.o: safeWriteToFile.cpp
+	$(CPP) -c safeWriteToFile.cpp -o safeWriteToFile.o $(CXXFLAGS)
+
+SearchDisplay.o: SearchDisplay.cpp
+	$(CPP) -c SearchDisplay.cpp -o SearchDisplay.o $(CXXFLAGS)
+
+updateAndSort.o: updateAndSort.cpp
+	$(CPP) -c updateAndSort.cpp -o updateAndSort.o $(CXXFLAGS)
+
+validateInput.o: validateInput.cpp
+	$(CPP) -c validateInput.cpp -o validateInput.o $(CXXFLAGS)
