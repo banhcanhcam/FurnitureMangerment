@@ -11,5 +11,5 @@ void updateAndSort(FurnitureList& store) {
             return a->getFurnitureID() < b->getFurnitureID();
         });
         
-    std::cout << "Hệ thống đã tự động sắp xếp lại danh sách.\n";
+    std::cout << "The system automatically rearranged the list.\n";
 }

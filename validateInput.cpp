@@ -14,7 +14,7 @@ double getValidDimension(const std::string& prompt) {
     double value;
     std::cout << prompt;
     while (!(std::cin >> value) || value <= 0) {
-        std::cout << "[Lỗi] Kích thước không hợp lệ. Vui lòng nhập lại (số > 0): ";
+        std::cout << "[Error] Invalid size. Please enter it again (number > 0): ";
         std::cin.clear();
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }

@@ -17,22 +17,24 @@
 using namespace std;
 
 // --- CÁC HÀM HỖ TRỢ NHẬP LIỆU ---
-static int readDay( const string & promt){
-	int value;
+static int readDay(const string& prompt) {
+    int value;
     while (true) {
-        cout << promt;
+        cout << prompt;
         if (cin >> value) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            
-            // KIỂM TRA: Nếu là số âm hoặc bằng 0 thì bắt nhập lại
-            if (value < 0) {
-                cout << "Error: Days must be bigger than 0. Please try again.\n";
+            if (value <= 0) {
+                cout << "Error: Days must be greater than 0. Please try again.\n";
                 continue;
-			}
             }
             return value;
+        } else {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input! Please enter a valid integer number.\n";
         }
     }
+}
 static int readNumber(const string& prompt) {
     int value;
     while (true) {
@@ -56,7 +58,7 @@ static int readInt(const string& prompt) {
         if (cin >> value) {
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             
-            // KIỂM TRA: Nếu là số âm hoặc bằng 0 thì bắt nhập lại
+            
             if (value < 0) {
                 cout << "Error: Value must be greater than 0. Please try again.\n";
                 continue;
@@ -214,7 +216,7 @@ int main() {
                 // Gọi với 7 tham số: OID, FID, Carpenter, Date, Days, fManager, username
                 case 4: 
                     oManager.createOrder(readLine("OID: "), readLine("FID: "), 
-                                         readLine("Carpenter: "), readLine("Date: "), 
+                                         readLineAlpha("Carpenter: "), readLine("Date: "), 
                                          readDay("Days: "), fManager, loggedInUser->username);
                     break;
                 case 5: oManager.trackByStatus(OrderStatus::PENDING); break;

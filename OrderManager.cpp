@@ -70,11 +70,11 @@ bool OrderManager::cancelOwnOrder(const std::string& orderId, const std::string&
                 orders.erase(it);
                 return true;
             } else {
-                std::cout << "Không thể hủy: Đơn hàng đã ở trạng thái IN_PROGRESS hoặc COMPLETED.\n";
+                std::cout << "Cannot cancel: The order is already IN_PROGRESS or COMPLETED.\n";
                 return false;
             }
         }
     }
-    std::cout << "Không tìm thấy đơn hàng của bạn.\n";
+    std::cout << "Can't find your order.\n";
     return false;
 }

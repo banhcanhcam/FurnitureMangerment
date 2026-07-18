@@ -1,5 +1,7 @@
 #include "FurnitureManager.h"
 #include "Validation.h"
+#include "ProductValidation.h"
+
 #include <iostream>
 
 void FurnitureManager::addFurniture(std::shared_ptr<FurnitureBase> furniture) {
@@ -61,10 +63,9 @@ bool FurnitureManager::saveToFile(const std::string& filename) const { return tr
 bool FurnitureManager::deleteProduct(const std::string& id) {
     for (auto& pair : inventory) {
         auto& vec = pair.second;
-        for (auto it = vec.begin(); it != vec.end(); ++it) {
-            if ((*it)->getFurnitureID() == id) {
-                vec.erase(it);
-                return true;
+        for (size_t i = 0; i < vec.size(); ++i) {
+            if (vec[i]->getFurnitureID() == id) {
+                return safeDelete(vec, i); // dùng hàm này
             }
         }
     }
