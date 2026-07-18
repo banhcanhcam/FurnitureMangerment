@@ -4,8 +4,8 @@
 CPP      = g++.exe
 CC       = gcc.exe
 WINDRES  = windres.exe
-OBJ      = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o
-LINKOBJ  = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o
+OBJ      = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o CustomerMenu.o
+LINKOBJ  = AccountManager.o checkStore.o FurnitureBase.o FurnitureManage.o main.o Order.o OrderManager.o PersistenceManager.o Product.o safeDelete.o safeWriteToFile.o SearchDisplay.o updateAndSort.o validateInput.o CustomerMenu.o
 LIBS     = -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib" -L"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/lib" -static-libgcc -fopenmp -pg
 INCS     = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include"
 CXXINCS  = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/x86_64-w64-mingw32/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include" -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/lib/gcc/x86_64-w64-mingw32/9.2.0/include/c++"
@@ -65,3 +65,6 @@ updateAndSort.o: updateAndSort.cpp
 
 validateInput.o: validateInput.cpp
 	$(CPP) -c validateInput.cpp -o validateInput.o $(CXXFLAGS)
+
+CustomerMenu.o: CustomerMenu.cpp
+	$(CPP) -c CustomerMenu.cpp -o CustomerMenu.o $(CXXFLAGS)

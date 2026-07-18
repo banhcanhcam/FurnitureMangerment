@@ -11,6 +11,7 @@
 #include "Product.h"
 #include "SearchDisplay.h"
 #include "PersistenceManager.h"
+#include "CustomerMenu.h"
 #include <cctype>
 
 using namespace std;
@@ -32,20 +33,6 @@ static int readDay( const string & promt){
             return value;
         }
     }
-static int readValue(const string & promt){
-	int value;
-	while(true){
-		cout << promt;
-		if (cin >> value) {
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			if (value < 0) {
-				cout << "Error: Value must be greater than 0. pls try again. \n";
-				continue;
-			}
-		}
-		return value;
-	}
-}
 static int readNumber(const string& prompt) {
     int value;
     while (true) {
@@ -258,13 +245,33 @@ int main() {
                     cout << "Tính năng thống kê đang được phát triển...\n";
                     break;
                 }
-                case 6: fManager.deleteProduct(readLine("Delete FID: ")); break;
-                case 7: oManager.deleteOrder(readLine("Delete OID: ")); break;
+                case 6: {
+    string fid = readLine("Delete FID: ");
+    if (fid.empty()) {
+        cout << "Don't have ID to delete!\n";
+    } else if (fManager.deleteProduct(fid)) {
+        cout << "Furniture item deleted successfully.\n";
+    } else {
+        cout << "Don't have Furniture Item with ID: " << fid << "\n";
+    }
+    break;
+}
+                case 7: {
+    string oid = readLine("Delete OID: ");
+    if (oid.empty()) {
+        cout << "Don't have ID to delete!\n";
+    } else if (oManager.deleteOrder(oid)) {
+        cout << "Order deleted successfully.\n";
+    } else {
+        cout << "Don't have Order with ID: " << oid << "\n";
+    }
+    break;
+}
                 default: cout << "Invalid!\n";
             }
         }
     } else {
-        cout << "Customer menu is currently under development.\n";
+        runCustomerMenu(fManager, oManager, loggedInUser->username);
     }
 PersistenceManager::saveAllData("furniture.txt", "account.txt", fManager, authSystem);
 std::cout << "Data has been save succesfully" << std::endl;

@@ -1,6 +1,5 @@
 #include "OrderManager.h"
 #include <iostream>
-#include <iomanip>
 
 void OrderManager::createOrder(const std::string& orderId, const std::string& fId, 
                                const std::string& carpenter, const std::string& date, 
@@ -41,7 +40,7 @@ void OrderManager::trackByStatus(OrderStatus status) const {
         if (o.getStatus() == status) {
             std::cout << "Order ID: " << o.getOrderID() 
                       << " | Carpenter: " << o.getCarpenterName() 
-                      << " | Price: " << std::fixed << std::setprecision(0) << o.getLaborCost() << "\n";
+                      << " | Price: " << o.getLaborCost() << "\n";
         }
     }
 }

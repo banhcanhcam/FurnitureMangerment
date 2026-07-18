@@ -36,8 +36,15 @@ std::shared_ptr<FurnitureBase> FurnitureManager::searchById(const std::string& i
 void FurnitureManager::displayAll() const {
     for (const auto& pair : inventory) {
         for (const auto& item : pair.second) {
+            std::string matStr;
+            switch (item->getMaterialType()) {
+                case MaterialType::WOOD: matStr = "Wood"; break;
+                case MaterialType::METAL: matStr = "Metal"; break;
+                case MaterialType::ALUMINUM: matStr = "Aluminum"; break;
+            }
             std::cout << "ID: " << item->getFurnitureID() 
-                      << " | Name: " << item->getName()              
+                      << " | Name: " << item->getName()     
+					  << " | Material: " << matStr         
                       << " | Price: " << item->getPrice()            
                       << " | Quantity: " << item->getQuantity()     
                       << " | Color: " << item->getBaseColor() 
