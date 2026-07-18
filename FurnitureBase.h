@@ -37,6 +37,9 @@ public:
     int getQuantity() const { return quantity; }
 
     // Setters
+    void setName(const std::string& n) { name = n; }
+    void setPrice(double p) { price = p; }
+    void setQuantity(int q) { quantity = q; }
     void setDimensions(double w, double h, double d);
     void setBaseColor(const std::string& color);
 };

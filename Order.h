@@ -4,6 +4,7 @@
 #include <string>
 #include <memory>
 #include "FurnitureBase.h"
+#include "Date.h"
 
 enum class OrderStatus { PENDING, IN_PROGRESS, COMPLETED };
 
@@ -11,35 +12,39 @@ class Order {
 private:
     std::string orderID;
     std::string carpenterName;
-    std::string startDate;
+    Date startDate;
     int estimatedDays;
     OrderStatus status;
     std::string furnitureID;
     double laborCost;
-    
-    // Đã xóa dòng trùng lặp ở đây
-    std::string customerUsername; 
+    std::string customerUsername;
+    std::string phoneNumber; // Số điện thoại liên hệ cho đơn hàng này
     std::shared_ptr<FurnitureBase> furnitureRef;
 
 public:
-	Order(std::string oId, std::string cName, std::string sDate, int eDays, 
-      std::string fId, std::shared_ptr<FurnitureBase> fRef, std::string uName);
+	Order(std::string oId, std::string cName, Date sDate, int eDays, 
+      std::string fId, std::shared_ptr<FurnitureBase> fRef, std::string uName, std::string phone);
 
     // Getters
     std::string getOrderID() const;
     std::string getCarpenterName() const;
-    std::string getStartDate() const;
+    Date getStartDate() const;
     int getEstimatedDays() const;
     OrderStatus getStatus() const;
     std::string getFurnitureID() const;
     double getLaborCost() const;
     std::shared_ptr<FurnitureBase> getFurniture() const;
-    std::string getCustomerUsername() const; // Getter cho tên khách
+    std::string getCustomerUsername() const;
+    std::string getPhoneNumber() const;
 
     // Setters
+    void setCarpenterName(const std::string& name);
+    void setStartDate(const Date& date);
+    void setEstimatedDays(int days);
     void setStatus(OrderStatus s);
     void setLaborCost(double cost);
-    void setCustomerUsername(const std::string& name); // Đã sửa: dùng void và tham số
+    void setCustomerUsername(const std::string& name);
+    void setPhoneNumber(const std::string& phone);
 };
 
 #endif // ORDER_H

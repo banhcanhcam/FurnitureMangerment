@@ -4,22 +4,15 @@
 // Khởi tạo AccountManager (Có thể tạo sẵn 1 tài khoản admin gốc để hệ thống không bị khóa)
 AccountManager::AccountManager() {
     // Tài khoản mặc định ban đầu
-    accounts["admin"] = {"admin", "1", UserRole::ADMIN};
+    accounts["admin"] = {"admin", "1", UserRole::ADMIN, ""};
 }
 
 // Chức năng Đăng ký
-bool AccountManager::registerAccount(const std::string& username, const std::string& password, UserRole role) {
-    // Kiểm tra xem username đã tồn tại trong map chưa
+bool AccountManager::registerAccount(const std::string& username, const std::string& password, UserRole role, const std::string& phone) {
     if (accounts.find(username) != accounts.end()) {
-        std::cout << "invalid username '" << username << "' already exist please choose another name.\n";
-        return false;
+        return false;  // không in gì
     }
-
-    // Nếu chưa tồn tại, thêm vào map
-    accounts[username] = {username, password, role};
-    
-    std::string roleStr = (role == UserRole::ADMIN) ? "ADMIN" : "CUSTOMER";
-    std::cout << "success create a new account " << roleStr << " new: " << username << "\n";
+    accounts[username] = {username, password, role, phone};
     return true;
 }
 
@@ -36,7 +29,25 @@ UserAccount* AccountManager::login(const std::string& username, const std::strin
     return nullptr; 
 }
 
-// Stub cho File I/O (Sẽ code sau)
+// Tìm tài khoản theo username
+UserAccount* AccountManager::findAccount(const std::string& username) {
+    auto it = accounts.find(username);
+    if (it != accounts.end()) return &(it->second);
+    return nullptr;
+}
+
+// Lấy danh sách toàn bộ khách hàng (dùng cho tính năng hiển thị)
+std::vector<UserAccount> AccountManager::getAllCustomers() const {
+    std::vector<UserAccount> result;
+    for (const auto& pair : accounts) {
+        if (pair.second.role == UserRole::CUSTOMER) {
+            result.push_back(pair.second);
+        }
+    }
+    return result;
+}
+
+// Stub cho File I/O (đã có PersistenceManager xử lý thực tế)
 bool AccountManager::loadAccountsFromFile(const std::string& filename) { return true; }
 bool AccountManager::saveAccountsToFile(const std::string& filename) const { return true; }
 // xóa tài khoản khách hàng.

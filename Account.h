@@ -14,6 +14,7 @@ struct UserAccount {
     std::string username;
     std::string password;
     UserRole role;
+    std::string phoneNumber; // Chỉ áp dụng cho tài khoản CUSTOMER, để trống với ADMIN
 };
 
 #endif // ACCOUNT_H

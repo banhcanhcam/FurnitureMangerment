@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "Order.h"
+#include "Date.h"
 #include "FurnitureManager.h"
 
 class OrderManager {
@@ -14,16 +15,15 @@ public:
 	bool cancelOwnOrder(const std::string& orderId, const std::string& username);
     OrderManager() = default;
 
-    // Thêm tham số const std::string& username vào khai báo
-void createOrder(const std::string& orderId, const std::string& fId, 
-                 const std::string& carpenter, const std::string& date, 
-                 int days, const FurnitureManager& fManager, const std::string& username);
+    void createOrder(const std::string& orderId, const std::string& fId, 
+                 const std::string& carpenter, const Date& date, 
+                 int days, const FurnitureManager& fManager, const std::string& username,
+                 const std::string& phoneNumber);
     double calculatePrice(const Order& o) const;
     void trackByStatus(OrderStatus status) const;
     
-    // --- THÊM DÒNG NÀY VÀO TRONG CLASS ---
     bool deleteOrder(const std::string& orderId); 
-    // --------------------------------------
+    bool updateOrder(const std::string& orderId, const std::string& carpenter, const Date& date, int days, OrderStatus status);
 
     const std::vector<Order>& getOrders() const;
 

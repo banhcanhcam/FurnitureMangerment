@@ -5,21 +5,11 @@
 #include <iostream>
 
 void FurnitureManager::addFurniture(std::shared_ptr<FurnitureBase> furniture) {
-    // Tìm xem ID đã tồn tại chưa
-    auto existingItem = searchById(furniture->getFurnitureID());
-    
-    if (existingItem != nullptr) {
-        // ID đã tồn tại: Cập nhật dữ liệu
-        std::cout << "The ID is duplicated, the data will be updated\n";
-        
-        // Cập nhật thông tin mới vào object cũ
-        existingItem->setDimensions(furniture->getWidth(), furniture->getHeight(), furniture->getDepth());
-        existingItem->setBaseColor(furniture->getBaseColor());
-        // Nếu lớp FurnitureBase của bạn có các hàm set khác như setName, setPrice thì gọi ở đây
-        
-        return; // Kết thúc hàm sau khi đã cập nhật
+    // Kiểm tra trùng ID bằng hàm edge-case đã có sẵn
+    if (isDuplicateId(inventory, furniture->getFurnitureID())) {
+        throw DuplicateIdException(furniture->getFurnitureID());
     }
-    
+
     // Nếu chưa tồn tại, thêm mới như bình thường
     inventory[furniture->getMaterialType()].push_back(furniture);
 }
@@ -70,4 +60,15 @@ bool FurnitureManager::deleteProduct(const std::string& id) {
         }
     }
     return false;
+}
+//update hàm
+bool FurnitureManager::updateFurniture(const std::string& id, const std::string& name, double price, int qty, double w, double h, double d, const std::string& color) {
+    auto item = searchById(id);
+    if (!item) return false;
+    item->setName(name);
+    item->setPrice(price);
+    item->setQuantity(qty);
+    item->setDimensions(w, h, d);
+    item->setBaseColor(color);
+    return true;
 }

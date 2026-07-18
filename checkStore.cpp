@@ -7,7 +7,7 @@ bool isStoreEmpty(const FurnitureInventory& store) {
             return false; // Chỉ cần 1 danh sách vật liệu có đồ là kho không rỗng
         }
     }
-    std::cout << "[Lỗi] Kho hàng hiện đang trống! Không thể thực hiện thao tác này.\n";
+    std::cout << "[Error] The warehouse is currently empty! Cannot perform this action.\n";
     return true;
 }
 

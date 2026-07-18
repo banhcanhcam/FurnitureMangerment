@@ -1,4 +1,5 @@
 #include "SearchDisplay.h"
+#include "ProductValidation.h"
 #include <algorithm>
 
 namespace SearchDisplay {
@@ -31,28 +32,38 @@ namespace SearchDisplay {
     }
 
     void printFurniture(const std::shared_ptr<FurnitureBase>& item) {
-        if (!item) return;
-        std::string matStr = (item->getMaterialType() == MaterialType::WOOD) ? "Wood" :
-                             (item->getMaterialType() == MaterialType::METAL) ? "Metal" : "Plastic";
-                             
-        std::string sizeStr = std::to_string((int)item->getWidth()) + "x" + 
-                              std::to_string((int)item->getHeight()) + "x" + 
-                              std::to_string((int)item->getDepth());
+    if (!item) return;
 
-        std::cout << std::left
-                  << std::setw(12) << item->getFurnitureID()
-                  << std::setw(10) << matStr
-                  << std::setw(15) << sizeStr
-                  << std::setw(15) << item->getBaseColor()
-                  << "\n";
+    // Chuyển MaterialType thành chuỗi
+    std::string matStr;
+    switch (item->getMaterialType()) {
+        case MaterialType::WOOD: matStr = "Wood"; break;
+        case MaterialType::METAL: matStr = "Metal"; break;
+        case MaterialType::ALUMINUM: matStr = "Aluminum"; break;
+        default: matStr = "Unknown";
     }
 
+    
+    std::string sizeStr = std::to_string((int)item->getWidth()) + "x" + 
+                          std::to_string((int)item->getHeight()) + "x" + 
+                          std::to_string((int)item->getDepth());
+
+    
+    std::cout << std::left
+              << std::setw(12) << item->getFurnitureID()
+              << std::setw(15) << item->getName()        
+              << std::setw(10) << item->getPrice()       
+              << std::setw(10) << item->getQuantity()   
+              << std::setw(10) << matStr
+              << std::setw(15) << sizeStr
+              << std::setw(15) << item->getBaseColor()
+              << "\n";
+    }
     void displayAllFurniture(const FurnitureManager& fm) {
         // Lấy toàn bộ dữ liệu từ Manager
         const auto& inventory = fm.getInventory();
-        if (inventory.empty()) {
-            std::cout << "No furniture in inventory.\n";
-            return;
+        if (isStoreEmpty(inventory)) {
+            return; // isStoreEmpty() already prints the error message
         }
         printFurnitureHeader();
         for (const auto& pair : inventory) {
@@ -69,13 +80,17 @@ namespace SearchDisplay {
         
         std::cout << std::left << std::setw(10) << "OrderID" 
                   << std::setw(15) << "Carpenter" 
+                  << std::setw(12) << "Start Date"
+                  << std::setw(13) << "Phone"
                   << std::setw(15) << "Labor Cost" << "\n"
-                  << std::string(40, '-') << "\n";
+                  << std::string(65, '-') << "\n";
 
         for (const auto& o : tempOrders) {
             if (o.getStatus() == status) {
                 std::cout << std::left << std::setw(10) << o.getOrderID()
                           << std::setw(15) << o.getCarpenterName()
+                          << std::setw(12) << o.getStartDate().toString()
+                          << std::setw(13) << o.getPhoneNumber()
                           << std::setw(15) << std::fixed << std::setprecision(2) << o.getLaborCost() << "\n";
                 found = true;
             }

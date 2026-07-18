@@ -22,6 +22,7 @@ const std::map<MaterialType, std::vector<std::shared_ptr<FurnitureBase>>>& getIn
     void addFurniture(std::shared_ptr<FurnitureBase> furniture);
     std::shared_ptr<FurnitureBase> searchById(const std::string& id) const;
     void displayAll() const;
+    bool updateFurniture(const std::string& id, const std::string& name, double price, int qty, double w, double h, double d, const std::string& color);
     
     // --- THÊM DÒNG NÀY VÀO TRONG CLASS ---
     bool deleteProduct(const std::string& id); 
