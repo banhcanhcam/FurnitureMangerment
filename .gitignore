@@ -4,6 +4,5 @@
 *.exe
 *.o
 *.obj
-*.dev
 *.depend
 *.layout
