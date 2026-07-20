@@ -15,6 +15,7 @@
 #include "SearchDisplay.h"
 #include "PersistenceManager.h"
 #include "CustomerMenu.h"
+#include "ProductValidation.h"
 
 
 using namespace std;
@@ -33,9 +34,9 @@ static void showAdminMainMenu() {
 static void showAdminFurnitureMenu() {
     cout << "\n---------- FURNITURE MANAGEMENT ----------\n"
             "1. Add new furniture item\n"
-            "2. Search furniture by ID\n"
-            "3. Find furniture by name\n"
-            "4. Display all furniture items\n"
+            "2. Find furniture by name\n"
+            "3. Display all furniture items\n"
+            "4. Display all, sorted by price (ascending)\n"
             "5. Update furniture\n"
             "6. Delete a furniture item\n"
             "0. Back to Admin Menu\n"
@@ -45,7 +46,7 @@ static void showAdminFurnitureMenu() {
 static void showAdminOrderMenu() {
     cout << "\n------------ ORDER MANAGEMENT -------------\n"
             "1. Create manufacturing order\n"
-            "2. Track orders by status\n"
+            "2. Display orders (filter by status)\n"
             "3. Update order\n"
             "4. Delete an order\n"
             "0. Back to Admin Menu\n"
@@ -56,16 +57,17 @@ static void showAdminCustomerMenu() {
     cout << "\n----------- CUSTOMER MANAGEMENT -----------\n"
             "1. Display all customers\n"
             "2. Search customer by username\n"
+            "3. Delete a customer account\n"
             "0. Back to Admin Menu\n"
             "-------------------------------------------\n";
 }
 
 // ===================== XỬ LÝ CHỨC NĂNG: FURNITURE =====================
 
-static void handleAddFurniture(FurnitureManager& fManager) {
+static void handleAddFurniture(FurnitureManager& fManager, AccountManager& aManager, OrderManager& oManager) {
     string id = readLine("ID: ");
-    string name = readValidName("Enter Product Name: ");
-    int m = readInt("Material (0:Wood, 1:Metal, 2:Aluminum): ");
+    string name = readUniqueFurnitureName("Enter Product Name: ", fManager.getInventory());
+    int m = readIntRange("Material (0:Wood, 1:Metal, 2:Aluminum): ",0 ,2);
     double w = readDouble("Width(cm): ");
     double h = readDouble("Height(cm): ");
     double d = readDouble("Depth(cm): ");
@@ -79,20 +81,12 @@ static void handleAddFurniture(FurnitureManager& fManager) {
         else f = make_shared<AluminumFurniture>(id, name, w, h, d, price, quantity, c);
         fManager.addFurniture(f);
         cout << "\n>>> Success: Added new furniture item (Name: " << name << ", ID: " << id << ") successfully! <<<\n";
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                        fManager, aManager, oManager, true);
     }
+    
     catch (const std::exception& e) {
         cout << "[Error] " << e.what() << "\n";
-    }
-}
-
-static void handleSearchFurnitureById(const FurnitureManager& fManager) {
-    string searchID = readLine("ID: ");
-    auto item = fManager.searchById(searchID);
-    if (item) {
-        cout << "Found item:" << endl;
-        item->display();
-    } else {
-        cout << "Item not found." << endl;
     }
 }
 
@@ -116,12 +110,14 @@ static void handleFindFurnitureByName(const FurnitureManager& fManager) {
     }
 }
 
-static void handleDeleteFurniture(FurnitureManager& fManager) {
+static void handleDeleteFurniture(FurnitureManager& fManager, AccountManager& aManager, OrderManager& oManager) {
     string fid = readLine("Delete FID: ");
     if (fid.empty()) {
         cout << "Don't have ID to delete!\n";
     } else if (fManager.deleteProduct(fid)) {
         cout << "Furniture item deleted successfully.\n";
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                        fManager, aManager, oManager, true);
     } else {
         cout << "Don't have Furniture Item with ID: " << fid << "\n";
     }
@@ -129,7 +125,7 @@ static void handleDeleteFurniture(FurnitureManager& fManager) {
 
 // ===================== XỬ LÝ CHỨC NĂNG: ORDER =====================
 
-static void handleCreateOrder(OrderManager& oManager, FurnitureManager& fManager, const string& username) {
+static void handleCreateOrder(OrderManager& oManager, FurnitureManager& fManager, AccountManager& aManager, const string& username) {
     string oid = readLine("OID: ");
     string fid = readLine("FID: ");
     string carpenter = readLineAlpha("Carpenter: ");
@@ -137,14 +133,34 @@ static void handleCreateOrder(OrderManager& oManager, FurnitureManager& fManager
     int days = readDay("Days: ");
     string phone = readPhoneNumber("Customer contact phone number: ");
     oManager.createOrder(oid, fid, carpenter, date, days, fManager, username, phone);
+    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                    fManager, aManager, oManager, true);
 }
 
-static void handleDeleteOrder(OrderManager& oManager) {
+static void handleDisplayOrders(OrderManager& oManager) {
+    cout << "\nFilter by status:\n"
+            "1. PENDING\n"
+            "2. IN_PROGRESS\n"
+            "3. COMPLETED\n"
+            "4. ALL\n";
+    int choice = readIntRange("Your choice: ", 1, 4);
+
+    switch (choice) {
+        case 1: SearchDisplay::displayOrdersByStatus(oManager, OrderStatus::PENDING); break;
+        case 2: SearchDisplay::displayOrdersByStatus(oManager, OrderStatus::IN_PROGRESS); break;
+        case 3: SearchDisplay::displayOrdersByStatus(oManager, OrderStatus::COMPLETED); break;
+        case 4: SearchDisplay::displayAllOrders(oManager); break;
+    }
+}
+
+static void handleDeleteOrder(OrderManager& oManager, FurnitureManager& fManager, AccountManager& aManager) {
     string oid = readLine("Delete OID: ");
     if (oid.empty()) {
         cout << "Don't have ID to delete!\n";
     } else if (oManager.deleteOrder(oid)) {
         cout << "Order deleted successfully.\n";
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                        fManager, aManager, oManager, true);
     } else {
         cout << "Don't have Order with ID: " << oid << "\n";
     }
@@ -177,43 +193,65 @@ static void handleSearchCustomer(AccountManager& aManager) {
     cout << "Phone Number: " << (acc->phoneNumber.empty() ? "(not set)" : acc->phoneNumber) << "\n";
 }
 
+static void handleDeleteCustomer(AccountManager& aManager, FurnitureManager& fManager, OrderManager& oManager) {
+    string username = readLine("Enter customer username to delete: ");
+    UserAccount* acc = aManager.findAccount(username);
+    if (!acc || acc->role != UserRole::CUSTOMER) {
+        cout << "Customer not found.\n";
+        return;
+    }
+    cout << "Are you sure you want to delete customer '" << username << "'? (y/n): ";
+    string confirm = readLine("");
+    if (confirm != "y" && confirm != "Y") {
+        cout << "Cancelled.\n";
+        return;
+    }
+    if (aManager.deleteCustomerAccount(username)) {
+        cout << "Customer account deleted successfully.\n";
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                        fManager, aManager, oManager, true);
+    } else {
+        cout << "Failed to delete customer account.\n";
+    }
+}
+
 // ===================== VÒNG LẶP SUBMENU (ADMIN) =====================
 
-static void runAdminFurnitureMenu(FurnitureManager& fManager) {
+static void runAdminFurnitureMenu(FurnitureManager& fManager, AccountManager& aManager, OrderManager& oManager) {
     while (true) {
         showAdminFurnitureMenu();
         int choice = readNumber("Option: ");
         if (choice == 0) return;
 
         switch (choice) {
-            case 1: handleAddFurniture(fManager); break;
-            case 2: handleSearchFurnitureById(fManager); break;
-            case 3: handleFindFurnitureByName(fManager); break;
-            case 4: SearchDisplay::displayAllFurniture(fManager); break;
-            case 5: UpdateFurniture::updateFurnitureFromInput(fManager); break;
-            case 6: handleDeleteFurniture(fManager); break;
+            case 1: handleAddFurniture(fManager, aManager, oManager); break;
+            case 2: handleFindFurnitureByName(fManager); break;
+            case 3: SearchDisplay::displayAllFurniture(fManager); break;
+            case 4: SearchDisplay::displayAllFurnitureSortedByPrice(fManager); break;
+            case 5: UpdateFurniture::updateFurnitureFromInput(fManager, aManager, oManager); break;
+            case 6: handleDeleteFurniture(fManager, aManager, oManager); break;
             default: cout << "Invalid option!\n";
         }
     }
 }
 
-static void runAdminOrderMenu(OrderManager& oManager, FurnitureManager& fManager, const string& username) {
+static void runAdminOrderMenu(OrderManager& oManager, FurnitureManager& fManager, AccountManager& aManager, const string& username) {
     while (true) {
         showAdminOrderMenu();
         int choice = readNumber("Option: ");
         if (choice == 0) return;
 
         switch (choice) {
-            case 1: handleCreateOrder(oManager, fManager, username); break;
-            case 2: SearchDisplay::displayOrdersByStatus(oManager, OrderStatus::PENDING); break;
-            case 3: UpdateOrder::updateOrderFromInput(oManager); break;
-            case 4: handleDeleteOrder(oManager); break;
+            case 1: handleCreateOrder(oManager, fManager, aManager, username); break;
+            case 2: handleDisplayOrders(oManager); break;
+            case 3: UpdateOrder::updateOrderFromInput(oManager, fManager, aManager); break;
+            case 4: handleDeleteOrder(oManager, fManager, aManager); break;
             default: cout << "Invalid option!\n";
         }
     }
 }
 
-static void runAdminCustomerMenu(AccountManager& aManager) {
+static void runAdminCustomerMenu(AccountManager& aManager, FurnitureManager& fManager, OrderManager& oManager) {
     while (true) {
         showAdminCustomerMenu();
         int choice = readNumber("Option: ");
@@ -222,6 +260,7 @@ static void runAdminCustomerMenu(AccountManager& aManager) {
         switch (choice) {
             case 1: handleDisplayAllCustomers(aManager); break;
             case 2: handleSearchCustomer(aManager); break;
+            case 3: handleDeleteCustomer(aManager, fManager, oManager); break;
             default: cout << "Invalid option!\n";
         }
     }
@@ -234,9 +273,9 @@ static void runAdminMenu(FurnitureManager& fManager, OrderManager& oManager, Acc
         if (choice == 0) break;
 
         switch (choice) {
-            case 1: runAdminFurnitureMenu(fManager); break;
-            case 2: runAdminOrderMenu(oManager, fManager, username); break;
-            case 3: runAdminCustomerMenu(aManager); break;
+            case 1: runAdminFurnitureMenu(fManager, aManager, oManager); break;
+            case 2: runAdminOrderMenu(oManager, fManager, aManager, username); break;
+            case 3: runAdminCustomerMenu(aManager, fManager, oManager); break;
             default: cout << "Invalid option!\n";
         }
     }
@@ -256,7 +295,11 @@ int main() {
         cout << "\n===== WELCOME TO FURNITURE SYSTEM =====\n";
         cout << "1. Login\n2. Register Customer\n3. Register Admin\n0. Exit\n";
         int choice = readNumber("Choose: ");
-        if (choice == 0) return 0;
+        if (choice == 0) {
+            // Lưu dữ liệu trước khi thoát, tránh mất dữ liệu (VD: vừa đăng ký xong rồi thoát ngay)
+            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", fManager, authSystem, oManager);
+            return 0;
+        }
 
         if (choice == 1) {
             string u, p;
@@ -277,6 +320,9 @@ int main() {
             }
             if (authSystem.registerAccount(u, p, r, phone)) {
                 cout << "Account created successfully.\n";
+                // Lưu ngay lập tức, không đợi đến khi đóng chương trình
+                PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                                fManager, authSystem, oManager, true);
             } else {
                 cout << "Username already exists.\n";
             }

@@ -27,7 +27,16 @@ namespace SearchDisplay {
     
     // Yêu cầu FurnitureManager phải có hàm getInventory()
     void displayAllFurniture(const FurnitureManager& fm); 
+
+    // ---- Order display (dùng chung cho Admin và Customer) ----
+    void printOrderHeader();
+    void printOrder(const Order& o);
     void displayOrdersByStatus(const OrderManager& om, OrderStatus status);
+    void displayAllOrders(const OrderManager& om);
+    void displayOrdersByCustomer(const OrderManager& om, const std::string& username);
+
+    // Hiển thị toàn bộ kho, sắp xếp theo giá tăng dần (dùng lại updateAndSort())
+    void displayAllFurnitureSortedByPrice(const FurnitureManager& fm);
 
     // ---- TÌM KIẾM (Search) ----
     std::shared_ptr<FurnitureBase> searchFurnitureById(const FurnitureManager& fm, const std::string& id);

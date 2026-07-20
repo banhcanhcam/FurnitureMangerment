@@ -1,9 +1,10 @@
 #include "UpdateOrder.h"
 #include "Validation.h"
+#include "PersistenceManager.h"
 #include <iostream>
 
 namespace UpdateOrder {
-    void updateOrderFromInput(OrderManager& oManager) {
+    void updateOrderFromInput(OrderManager& oManager, FurnitureManager& fManager, AccountManager& aManager) {
         std::string oid = readLine("Enter Order ID to update: ");
         bool found = false;
         for (auto& o : oManager.getOrders()) {
@@ -47,6 +48,8 @@ namespace UpdateOrder {
 
                 if (oManager.updateOrder(oid, carpenter, date, days, status)) {
                     std::cout << "Order updated successfully.\n";
+                    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                                    fManager, aManager, oManager, true);
                 } else {
                     std::cout << "Update failed.\n";
                 }

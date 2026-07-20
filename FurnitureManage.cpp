@@ -10,6 +10,11 @@ void FurnitureManager::addFurniture(std::shared_ptr<FurnitureBase> furniture) {
         throw DuplicateIdException(furniture->getFurnitureID());
     }
 
+    // Kiểm tra trùng Tên - cảnh báo ngay, không cho tạo item cùng tên
+    if (isDuplicateName(inventory, furniture->getName())) {
+        throw DuplicateNameException(furniture->getName());
+    }
+
     // Nếu chưa tồn tại, thêm mới như bình thường
     inventory[furniture->getMaterialType()].push_back(furniture);
 }

@@ -12,7 +12,7 @@ CXXINCS  = -I"C:/Program Files (x86)/Embarcadero/Dev-Cpp/TDM-GCC-64/include" -I"
 BIN      = "cuu t.exe"
 CXXFLAGS = $(CXXINCS) -pg -fopenmp
 CFLAGS   = $(INCS) -pg -fopenmp
-DEL      = C:\Program Files (x86)\Embarcadero\Dev-Cpp\DevCpp.exe INTERNAL_DEL
+DEL      = C:\Program Files (x86)\Embarcadero\Dev-Cpp\devcpp.exe INTERNAL_DEL
 
 .PHONY: all all-before all-after clean clean-custom
 

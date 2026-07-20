@@ -73,29 +73,100 @@ namespace SearchDisplay {
         }
     }
 
-    void displayOrdersByStatus(const OrderManager& om, OrderStatus status) {
-        // Tạo một bản sao để không ảnh hưởng dữ liệu gốc khi in
-        std::vector<Order> tempOrders = om.getOrders();
-        bool found = false;
-        
-        std::cout << std::left << std::setw(10) << "OrderID" 
-                  << std::setw(15) << "Carpenter" 
+    void displayAllFurnitureSortedByPrice(const FurnitureManager& fm) {
+        const auto& inventory = fm.getInventory();
+        if (isStoreEmpty(inventory)) {
+            return; // isStoreEmpty() already prints the error message
+        }
+
+        // Gộp toàn bộ các nhóm vật liệu thành 1 danh sách để sort xuyên suốt kho
+        FurnitureList allItems;
+        for (const auto& pair : inventory) {
+            for (const auto& item : pair.second) {
+                allItems.push_back(item);
+            }
+        }
+
+        // Dùng lại hàm updateAndSort() đã có sẵn (đã sửa để sort theo giá tăng dần)
+        updateAndSort(allItems);
+
+        printFurnitureHeader();
+        for (const auto& item : allItems) {
+            printFurniture(item);
+        }
+    }
+
+    // ---- Chuyển OrderStatus thành chuỗi hiển thị ----
+    std::string orderStatusToString(OrderStatus status) {
+        switch (status) {
+            case OrderStatus::PENDING: return "PENDING";
+            case OrderStatus::IN_PROGRESS: return "IN_PROGRESS";
+            case OrderStatus::COMPLETED: return "COMPLETED";
+        }
+        return "UNKNOWN";
+    }
+
+    void printOrderHeader() {
+        std::cout << std::left
+                  << std::setw(10) << "OrderID"
+                  << std::setw(10) << "Furniture"
+                  << std::setw(15) << "Carpenter"
                   << std::setw(12) << "Start Date"
                   << std::setw(13) << "Phone"
+                  << std::setw(13) << "Status"
                   << std::setw(15) << "Labor Cost" << "\n"
-                  << std::string(65, '-') << "\n";
+                  << std::string(88, '-') << "\n";
+    }
 
-        for (const auto& o : tempOrders) {
+    void printOrder(const Order& o) {
+        std::cout << std::left
+                  << std::setw(10) << o.getOrderID()
+                  << std::setw(10) << o.getFurnitureID()
+                  << std::setw(15) << o.getCarpenterName()
+                  << std::setw(12) << o.getStartDate().toString()
+                  << std::setw(13) << o.getPhoneNumber()
+                  << std::setw(13) << orderStatusToString(o.getStatus())
+                  << std::setw(15) << std::fixed << std::setprecision(2) << o.getLaborCost() << "\n";
+    }
+
+    void displayOrdersByStatus(const OrderManager& om, OrderStatus status) {
+        const auto& orders = om.getOrders();
+        bool found = false;
+
+        printOrderHeader();
+        for (const auto& o : orders) {
             if (o.getStatus() == status) {
-                std::cout << std::left << std::setw(10) << o.getOrderID()
-                          << std::setw(15) << o.getCarpenterName()
-                          << std::setw(12) << o.getStartDate().toString()
-                          << std::setw(13) << o.getPhoneNumber()
-                          << std::setw(15) << std::fixed << std::setprecision(2) << o.getLaborCost() << "\n";
+                printOrder(o);
                 found = true;
             }
         }
         if (!found) std::cout << "No orders found for this status.\n";
+    }
+
+    void displayAllOrders(const OrderManager& om) {
+        const auto& orders = om.getOrders();
+        if (orders.empty()) {
+            std::cout << "No orders in the system yet.\n";
+            return;
+        }
+        printOrderHeader();
+        for (const auto& o : orders) {
+            printOrder(o);
+        }
+    }
+
+    void displayOrdersByCustomer(const OrderManager& om, const std::string& username) {
+        const auto& orders = om.getOrders();
+        bool found = false;
+
+        printOrderHeader();
+        for (const auto& o : orders) {
+            if (o.getCustomerUsername() == username) {
+                printOrder(o);
+                found = true;
+            }
+        }
+        if (!found) std::cout << "You have no orders yet.\n";
     }
 
     // ---- TÌM KIẾM ----

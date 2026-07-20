@@ -10,7 +10,8 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
                                      const std::string& orderFile,
                                      const FurnitureManager& fManager,
                                      const AccountManager& aManager,
-                                     const OrderManager& oManager) {
+                                     const OrderManager& oManager,
+                                     bool silent) {
     bool success = true;
 
     // Lưu furniture
@@ -34,6 +35,7 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
             }
         }
         fOut.close();
+        if (!silent) std::cout << "[OK] Saved " << furnitureFile << "\n";
     }
 
     // Lưu tài khoản: tách riêng Admin và Customer ra 2 file khác nhau
@@ -59,6 +61,10 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
                 customerOut << acc.username << "," << acc.password << "," << acc.phoneNumber << "\n";
             }
         }
+        if (!silent) {
+            std::cout << "[OK] Saved " << adminFile << "\n";
+            std::cout << "[OK] Saved " << customerFile << "\n";
+        }
     }
     adminOut.close();
     customerOut.close();
@@ -66,6 +72,8 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
     // Lưu đơn hàng
     if (!oManager.saveToFile(orderFile)) {
         success = false;
+    } else if (!silent) {
+        std::cout << "[OK] Saved " << orderFile << "\n";
     }
 
     return success;

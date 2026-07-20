@@ -1,9 +1,13 @@
 #include "UpdateFurniture.h"
 #include "Validation.h"
+#include "PersistenceManager.h"
+#include "ProductValidation.h"
 #include <iostream>
 
 namespace UpdateFurniture {
-    void updateFurnitureFromInput(FurnitureManager& fManager) {
+    void updateFurnitureFromInput(FurnitureManager& fManager, 
+                                  AccountManager& aManager, 
+                                  OrderManager& oManager) {
         std::string id = readLine("Enter Furniture ID to update: ");
         auto item = fManager.searchById(id);
         if (!item) {
@@ -33,7 +37,7 @@ namespace UpdateFurniture {
         std::string color = item->getBaseColor();
 
         switch (choice) {
-            case 1: name = readLine("New name: "); break;
+            case 1: name = readUniqueFurnitureName("New name: ", fManager.getInventory(), id); break;
             case 2: price = readDouble("New price: "); break;
             case 3: qty = readNumber("New quantity: "); break;
             case 4: w = readDouble("New width: "); break;
@@ -46,6 +50,8 @@ namespace UpdateFurniture {
 
         if (fManager.updateFurniture(id, name, price, qty, w, h, d, color)) {
             std::cout << "Furniture updated successfully.\n";
+            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
+                                            fManager, aManager, oManager, true);
         } else {
             std::cout << "Update failed.\n";
         }

@@ -6,6 +6,6 @@
 #include "AccountManager.h"
 #include <string>
 
-void runCustomerMenu(FurnitureManager& fManager, OrderManager& oManager, AccountManager& aManager, const std::string& username);
+void runCustomerMenu(FurnitureManager& fManager, OrderManager& oManager, AccountManager& aManager, std::string username);
 
 #endif

@@ -32,6 +32,18 @@ public:
     }
 };
 
+// Lỗi khi Tên sản phẩm bị trùng
+class DuplicateNameException : public std::exception {
+    std::string msg;
+public:
+    DuplicateNameException(const std::string& name) {
+        msg = "Duplicate Name: Furniture named '" + name + "' already exists.";
+    }
+    const char* what() const noexcept override { 
+        return msg.c_str(); 
+    }
+};
+
 // Lỗi khi không nhập tên thợ mộc
 class MissingCarpenterException : public std::exception {
 public:
@@ -51,6 +63,12 @@ inline bool hasDigit(const std::string& str) {
     }
     return false;
 }
+inline bool hasWhitespace(const std::string& str) {
+    for (char c : str) {
+        if (std::isspace(static_cast<unsigned char>(c))) return true;
+    }
+    return false;
+}
 // Hàm này sẽ đảm nhận toàn bộ việc "hỏi - kiểm tra - ép nhập lại"
 inline std::string readValidName(const std::string& prompt) {
     std::string name;
@@ -61,9 +79,11 @@ inline std::string readValidName(const std::string& prompt) {
             std::cout << "Name cannot be empty! Please try again.\n";
         } else if (hasDigit(name)) {
             std::cout << "Invalid name! Name cannot contain numbers. Try again.\n";
+        } else if (hasWhitespace(name)) {
+            std::cout << "Invalid name! Name cannot contain spaces. Try again.\n";
         }
         
-    } while (name.empty() || hasDigit(name));
+    } while (name.empty() || hasDigit(name) || hasWhitespace(name));
     
     return name;
 }
@@ -212,7 +232,24 @@ inline Date readDateOrKeep(const std::string& prompt, const Date& current) {
         std::cout << "Invalid date! Please enter a real date in DD/MM/YYYY format, or press Enter to keep.\n";
     }
 }
-
+// Đọc số nguyên trong khoảng [min, max]
+inline int readIntRange(const std::string& prompt, int min, int max) {
+    int value;
+    while (true) {
+        std::cout << prompt;
+        if (std::cin >> value) {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            if (value >= min && value <= max) {
+                return value;
+            }
+            std::cout << "Error: Value must be between " << min << " and " << max << ". Try again.\n";
+        } else {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            std::cout << "Invalid input! Please enter a valid integer.\n";
+        }
+    }
+}
 
 
 #endif // VALIDATION_H
