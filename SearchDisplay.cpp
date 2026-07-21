@@ -4,10 +4,10 @@
 
 namespace SearchDisplay {
 
-    // ---- TIỆN ÍCH ----
+    
     std::string trim(const std::string& s) {
         size_t start = s.find_first_not_of(" \t\n\r");
-        if (start == std::string::npos) return ""; // Tránh lỗi crash nếu chuỗi toàn khoảng trắng
+        if (start == std::string::npos) return ""; 
         size_t end = s.find_last_not_of(" \t\n\r");
         return s.substr(start, end - start + 1);
     }
@@ -18,7 +18,7 @@ namespace SearchDisplay {
         return r;
     }
 
-    // ---- HIỂN THỊ ----
+   
     void printFurnitureHeader() {
         std::cout << std::left
                   << std::setw(12) << "ID"
@@ -200,13 +200,12 @@ namespace SearchDisplay {
     }
     std::vector<std::shared_ptr<FurnitureBase>> searchFurnitureByName(const FurnitureManager& fm, const std::string& name) {
         std::vector<std::shared_ptr<FurnitureBase>> results;
-        std::string target = toLower(name); // Sử dụng hàm toLower có sẵn trong SearchDisplay[cite: 22, 23]
+        std::string target = toLower(name); 
         
-        const auto& inventory = fm.getInventory(); // Lấy dữ liệu từ Manager
+        const auto& inventory = fm.getInventory(); 
         for (const auto& pair : inventory) {
             for (const auto& item : pair.second) {
                 std::string itemName = toLower(item->getName());
-                // Kiểm tra chuỗi con[cite: 22]
                 if (itemName.find(target) != std::string::npos) {
                     results.push_back(item);
                 }
