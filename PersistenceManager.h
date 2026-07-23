@@ -14,6 +14,7 @@ public:
                            const std::string& adminFile,
                            const std::string& customerFile,
                            const std::string& orderFile,
+                           const std::string& invoiceFile,
                            const FurnitureManager& fManager,
                            const AccountManager& aManager,
                            const OrderManager& oManager,
@@ -24,6 +25,7 @@ public:
                            const std::string& adminFile,
                            const std::string& customerFile,
                            const std::string& orderFile,
+                           const std::string& invoiceFile,
                            FurnitureManager& fManager,
                            AccountManager& aManager,
                            OrderManager& oManager);

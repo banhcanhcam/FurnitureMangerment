@@ -50,8 +50,8 @@ namespace UpdateFurniture {
 
         if (fManager.updateFurniture(id, name, price, qty, w, h, d, color)) {
             std::cout << "Furniture updated successfully.\n";
-            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                            fManager, aManager, oManager, true);
+            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt",
+                                fManager, aManager, oManager, true);
         } else {
             std::cout << "Update failed.\n";
         }

@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1;0;0;0;0;0;16;0;0;0
-UnitCount=34
+UnitCount=36
 
 [VersionInfo]
 Major=1
@@ -382,6 +382,26 @@ BuildCmd=
 
 [Unit34]
 FileName=Date.cpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit35]
+FileName=Invoice.h
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=Invoice.cpp
 CompileCpp=1
 Folder=
 Compile=1

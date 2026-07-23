@@ -4,7 +4,9 @@
 #include "UpdateFurniture.h"
 #include "UpdateOrder.h"
 #include "PersistenceManager.h"
+
 #include <iostream>
+#include <iomanip>
 #include <limits>
 
 using namespace std;
@@ -35,6 +37,7 @@ static void showCustomerOrderMenu() {
             "2. View my orders\n"
             "3. Cancel my order (only pending)\n"
             "4. Update my order (only pending)\n"
+            "5. View my invoices\n"
             "0. Back to Customer Menu\n"
             "----------------------------------\n";
 }
@@ -55,12 +58,11 @@ static void handleCreateOrder(OrderManager& oManager, FurnitureManager& fManager
     string oid = readLine("Order ID: ");
     string fid = readLine("Furniture ID: ");
     string carpenter = readLine("Carpenter name: ");
-    Date date = readDate("Start date");
     int days = readDay("Estimated days: ");
+    int qty = readNumber("Quantity: ");
     string phone = readPhoneNumber("Contact phone number: ");
-    oManager.createOrder(oid, fid, carpenter, date, days, fManager, username, phone);
-    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                    fManager, aManager, oManager, true);
+    oManager.createOrder(oid, fid, carpenter, days, fManager, username, phone, qty);
+    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
 }
 
 static void handleViewMyOrders(OrderManager& oManager, const std::string& username) {
@@ -72,8 +74,7 @@ static void handleCancelMyOrder(OrderManager& oManager, FurnitureManager& fManag
     string oid = readLine("Enter Order ID to cancel: ");
     if (oManager.cancelOwnOrder(oid, username)) {
         cout << "Order cancelled successfully.\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
     } else {
         cout << "Cancellation failed. (Check ID, status, or ownership)\n";
     }
@@ -100,8 +101,7 @@ static void handleUpdateMyOrder(OrderManager& oManager, FurnitureManager& fManag
             if (days == -1) days = o.getEstimatedDays();
             if (oManager.updateOrder(oid, carpenter, date, days, o.getStatus())) {
                 cout << "Order updated.\n";
-                PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                                fManager, aManager, oManager, true);
+                PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
             } else {
                 cout << "Update failed.\n";
             }
@@ -111,6 +111,7 @@ static void handleUpdateMyOrder(OrderManager& oManager, FurnitureManager& fManag
     }
     if (!own) cout << "Order not found or not yours.\n";
 }
+
 
 // ===================== XỬ LÝ CHỨC NĂNG: PROFILE =====================
 
@@ -135,8 +136,7 @@ static bool handleDeleteMyAccount(AccountManager& aManager, FurnitureManager& fM
     }
     if (aManager.deleteCustomerAccount(username)) {
         cout << "Your account has been deleted. You will now be logged out.\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
         return true;
     }
     cout << "Failed to delete account.\n";
@@ -159,6 +159,69 @@ static void runCustomerFurnitureMenu(FurnitureManager& fManager, AccountManager&
         }
     }
 }
+// CustomerMenu.cpp
+// Add this before runCustomerOrderMenu() or anywhere before it's called
+
+static void handleViewMyInvoices(OrderManager& oManager, const std::string& username) {
+    auto invoices = oManager.getInvoicesByCustomer(username);
+    if (invoices.empty()) {
+        cout << "You have no invoices yet.\n";
+        return;
+    }
+
+    cout << "\n--- Your Invoices ---\n";
+    cout << std::left
+         << std::setw(15) << "Invoice ID"
+         << std::setw(12) << "Order ID"
+         << std::setw(18) << "Total Amount"
+         << std::setw(12) << "Date"
+         << std::setw(10) << "Paid"
+         << "\n" << std::string(67, '-') << "\n";
+
+    for (const auto& inv : invoices) {
+        cout << std::left
+             << std::setw(15) << inv.getInvoiceID()
+             << std::setw(12) << inv.getOrderID()
+             << std::setw(18) << std::fixed << std::setprecision(2) << inv.getTotalAmount()
+             << std::setw(12) << inv.getCreatedDate().toString()
+             << std::setw(10) << (inv.getIsPaid() ? "Yes" : "No")
+             << "\n";
+    }
+
+    // Option to view invoice details
+    cout << "\nEnter Order ID to view invoice details (or 0 to return): ";
+    string oid = readLine("");
+    if (oid != "0") {
+        Invoice* inv = oManager.findInvoiceByOrderId(oid);
+        if (inv) {
+            cout << "\n+-------------------------------------------+\n";
+            cout << "|          INVOICE DETAILS                  |\n";
+            cout << "+-------------------------------------------+\n";
+            cout << "| Invoice ID : " << std::left << std::setw(28) << inv->getInvoiceID() << "|\n";
+            cout << "| Order ID   : " << std::left << std::setw(28) << inv->getOrderID() << "|\n";
+            cout << "| Total      : " << std::left << std::setw(28) << std::fixed << std::setprecision(2) << inv->getTotalAmount() << "|\n";
+            cout << "| Date       : " << std::left << std::setw(28) << inv->getCreatedDate().toString() << "|\n";
+            cout << "| Paid       : " << std::left << std::setw(28) << (inv->getIsPaid() ? "Yes" : "No") << "|\n";
+            
+            // Hiển thị thông tin đơn hàng liên quan
+            for (const auto& o : oManager.getOrders()) {
+                if (o.getOrderID() == oid) {
+                    cout << "+-------------------------------------------+\n";
+                    cout << "| ORDER DETAILS                            |\n";
+                    cout << "+-------------------------------------------+\n";
+                    cout << "| Carpenter : " << std::left << std::setw(28) << o.getCarpenterName() << "|\n";
+                    cout << "| Furniture : " << std::left << std::setw(28) << o.getFurnitureID() << "|\n";
+                    cout << "| Quantity  : " << std::left << std::setw(28) << o.getQuantity() << "|\n";
+                    cout << "| Start Date: " << std::left << std::setw(28) << o.getStartDate().toString() << "|\n";
+                    break;
+                }
+            }
+            cout << "+-------------------------------------------+\n";
+        } else {
+            cout << "No invoice found for Order ID: " << oid << "\n";
+        }
+    }
+}
 
 static void runCustomerOrderMenu(OrderManager& oManager, FurnitureManager& fManager, AccountManager& aManager, const std::string& username) {
     while (true) {
@@ -171,6 +234,7 @@ static void runCustomerOrderMenu(OrderManager& oManager, FurnitureManager& fMana
             case 2: handleViewMyOrders(oManager, username); break;
             case 3: handleCancelMyOrder(oManager, fManager, aManager, username); break;
             case 4: handleUpdateMyOrder(oManager, fManager, aManager, username); break;
+            case 5: handleViewMyInvoices(oManager, username); break;
             default: cout << "Invalid option!\n";
         }
     }
@@ -214,4 +278,5 @@ void runCustomerMenu(FurnitureManager& fManager, OrderManager& oManager, Account
             default: cout << "Invalid option!\n";
         }
     }
+
 }

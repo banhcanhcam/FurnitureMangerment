@@ -8,6 +8,7 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
                                      const std::string& adminFile,
                                      const std::string& customerFile,
                                      const std::string& orderFile,
+                                     const std::string& invoiceFile,
                                      const FurnitureManager& fManager,
                                      const AccountManager& aManager,
                                      const OrderManager& oManager,
@@ -69,20 +70,28 @@ bool PersistenceManager::saveAllData(const std::string& furnitureFile,
     adminOut.close();
     customerOut.close();
 
-    // Lưu đơn hàng
+        // Lưu đơn hàng
     if (!oManager.saveToFile(orderFile)) {
         success = false;
     } else if (!silent) {
         std::cout << "[OK] Saved " << orderFile << "\n";
     }
 
-    return success;
-}
+    // ---- LƯU INVOICE (đặt trong hàm) ----
+    if (!oManager.saveInvoicesToFile(invoiceFile)) {
+        success = false;
+        std::cerr << "Error: Cannot save invoices.\n";
+    } else if (!silent) {
+        std::cout << "[OK] Saved " << invoiceFile << "\n";
+    }
 
+    return success;   // ← Chỉ một lần duy nhất
+}
 bool PersistenceManager::loadAllData(const std::string& furnitureFile,
                                      const std::string& adminFile,
                                      const std::string& customerFile,
                                      const std::string& orderFile,
+                                     const std::string& invoiceFile,
                                      FurnitureManager& fManager,
                                      AccountManager& aManager,
                                      OrderManager& oManager) {
@@ -181,6 +190,11 @@ bool PersistenceManager::loadAllData(const std::string& furnitureFile,
     // Load đơn hàng (phải load sau Furniture)
     if (!oManager.loadFromFile(orderFile, fManager)) {
         success = false;
+    }
+    // ---- LOAD INVOICE ----
+    if (!oManager.loadInvoicesFromFile(invoiceFile)) {
+        success = false;
+        std::cerr << "Warning: Cannot load invoices.\n";
     }
 
     return success;

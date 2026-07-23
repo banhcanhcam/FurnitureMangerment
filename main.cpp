@@ -49,6 +49,7 @@ static void showAdminOrderMenu() {
             "2. Display orders (filter by status)\n"
             "3. Update order\n"
             "4. Delete an order\n"
+            "5. Display all invoices\n"
             "0. Back to Admin Menu\n"
             "-------------------------------------------\n";
 }
@@ -81,8 +82,7 @@ static void handleAddFurniture(FurnitureManager& fManager, AccountManager& aMana
         else f = make_shared<AluminumFurniture>(id, name, w, h, d, price, quantity, c);
         fManager.addFurniture(f);
         cout << "\n>>> Success: Added new furniture item (Name: " << name << ", ID: " << id << ") successfully! <<<\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
     }
     
     catch (const std::exception& e) {
@@ -116,8 +116,7 @@ static void handleDeleteFurniture(FurnitureManager& fManager, AccountManager& aM
         cout << "Don't have ID to delete!\n";
     } else if (fManager.deleteProduct(fid)) {
         cout << "Furniture item deleted successfully.\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
     } else {
         cout << "Don't have Furniture Item with ID: " << fid << "\n";
     }
@@ -129,12 +128,11 @@ static void handleCreateOrder(OrderManager& oManager, FurnitureManager& fManager
     string oid = readLine("OID: ");
     string fid = readLine("FID: ");
     string carpenter = readLineAlpha("Carpenter: ");
-    Date date = readDate("Start date");
     int days = readDay("Days: ");
+    int qty = readNumber("Quantity: ");
     string phone = readPhoneNumber("Customer contact phone number: ");
-    oManager.createOrder(oid, fid, carpenter, date, days, fManager, username, phone);
-    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                    fManager, aManager, oManager, true);
+    oManager.createOrder(oid, fid, carpenter, days, fManager, username, phone, qty);
+    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
 }
 
 static void handleDisplayOrders(OrderManager& oManager) {
@@ -159,13 +157,49 @@ static void handleDeleteOrder(OrderManager& oManager, FurnitureManager& fManager
         cout << "Don't have ID to delete!\n";
     } else if (oManager.deleteOrder(oid)) {
         cout << "Order deleted successfully.\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
     } else {
         cout << "Don't have Order with ID: " << oid << "\n";
     }
 }
+// main.cpp - Add with other order handlers
 
+static void handleDisplayAllInvoices(OrderManager& oManager) {
+    const auto& invoices = oManager.getAllInvoices();
+    if (invoices.empty()) {
+        cout << "No invoices found.\n";
+        return;
+    }
+
+    cout << "\n--- ALL INVOICES ---\n";
+    cout << std::left
+         << std::setw(15) << "Invoice ID"
+         << std::setw(15) << "Order ID"
+         << std::setw(12) << "Customer"
+         << std::setw(18) << "Total Amount"
+         << std::setw(12) << "Date"
+         << std::setw(10) << "Paid"
+         << "\n" << std::string(82, '-') << "\n";
+
+    for (const auto& inv : invoices) {
+        // Find customer username
+        std::string customer = "Unknown";
+        for (const auto& o : oManager.getOrders()) {
+            if (o.getOrderID() == inv.getOrderID()) {
+                customer = o.getCustomerUsername();
+                break;
+            }
+        }
+        cout << std::left
+             << std::setw(15) << inv.getInvoiceID()
+             << std::setw(15) << inv.getOrderID()
+             << std::setw(12) << customer
+             << std::setw(18) << std::fixed << std::setprecision(2) << inv.getTotalAmount()
+             << std::setw(12) << inv.getCreatedDate().toString()
+             << std::setw(10) << (inv.getIsPaid() ? "Yes" : "No")
+             << "\n";
+    }
+}
 // ===================== XỬ LÝ CHỨC NĂNG: CUSTOMER =====================
 
 static void handleDisplayAllCustomers(AccountManager& aManager) {
@@ -208,8 +242,7 @@ static void handleDeleteCustomer(AccountManager& aManager, FurnitureManager& fMa
     }
     if (aManager.deleteCustomerAccount(username)) {
         cout << "Customer account deleted successfully.\n";
-        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                        fManager, aManager, oManager, true);
+        PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, aManager, oManager, true);
     } else {
         cout << "Failed to delete customer account.\n";
     }
@@ -246,6 +279,7 @@ static void runAdminOrderMenu(OrderManager& oManager, FurnitureManager& fManager
             case 2: handleDisplayOrders(oManager); break;
             case 3: UpdateOrder::updateOrderFromInput(oManager, fManager, aManager); break;
             case 4: handleDeleteOrder(oManager, fManager, aManager); break;
+            case 5: handleDisplayAllInvoices(oManager); break;
             default: cout << "Invalid option!\n";
         }
     }
@@ -288,7 +322,7 @@ int main() {
     UserAccount* loggedInUser = nullptr;
     FurnitureManager fManager;
     OrderManager oManager;
-    PersistenceManager::loadAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", fManager, authSystem, oManager);
+    PersistenceManager::loadAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, authSystem, oManager);
 
     // --- CỔNG ĐĂNG NHẬP ---
     while (loggedInUser == nullptr) {
@@ -297,7 +331,7 @@ int main() {
         int choice = readNumber("Choose: ");
         if (choice == 0) {
             // Lưu dữ liệu trước khi thoát, tránh mất dữ liệu (VD: vừa đăng ký xong rồi thoát ngay)
-            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", fManager, authSystem, oManager);
+            PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, authSystem, oManager);
             return 0;
         }
 
@@ -321,8 +355,7 @@ int main() {
             if (authSystem.registerAccount(u, p, r, phone)) {
                 cout << "Account created successfully.\n";
                 // Lưu ngay lập tức, không đợi đến khi đóng chương trình
-                PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                                fManager, authSystem, oManager, true);
+                PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, authSystem, oManager, true);
             } else {
                 cout << "Username already exists.\n";
             }
@@ -336,7 +369,7 @@ int main() {
         runCustomerMenu(fManager, oManager, authSystem, loggedInUser->username);
     }
 
-    if (!PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", fManager, authSystem, oManager)) {
+    if (!PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt", fManager, authSystem, oManager, true)) {
         std::cerr << "Warning: Some data may not have been saved.\n";
     } else {
         std::cout << "All data saved successfully.\n";

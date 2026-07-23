@@ -20,10 +20,12 @@ private:
     std::string customerUsername;
     std::string phoneNumber; // Số điện thoại liên hệ cho đơn hàng này
     std::shared_ptr<FurnitureBase> furnitureRef;
+    int quantity;
 
 public:
-	Order(std::string oId, std::string cName, Date sDate, int eDays, 
-      std::string fId, std::shared_ptr<FurnitureBase> fRef, std::string uName, std::string phone);
+    Order(std::string oId, std::string cName, Date sDate, int eDays, 
+          std::string fId, std::shared_ptr<FurnitureBase> fRef, 
+          std::string uName, std::string phone, int qty);
 
     // Getters
     std::string getOrderID() const;
@@ -36,6 +38,7 @@ public:
     std::shared_ptr<FurnitureBase> getFurniture() const;
     std::string getCustomerUsername() const;
     std::string getPhoneNumber() const;
+    int getQuantity() const;
 
     // Setters
     void setCarpenterName(const std::string& name);
@@ -45,6 +48,7 @@ public:
     void setLaborCost(double cost);
     void setCustomerUsername(const std::string& name);
     void setPhoneNumber(const std::string& phone);
+    void setQuantity(int qty);
 };
 
 #endif // ORDER_H

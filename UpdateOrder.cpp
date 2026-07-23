@@ -48,8 +48,8 @@ namespace UpdateOrder {
 
                 if (oManager.updateOrder(oid, carpenter, date, days, status)) {
                     std::cout << "Order updated successfully.\n";
-                    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt",
-                                                    fManager, aManager, oManager, true);
+                    PersistenceManager::saveAllData("furniture.txt", "admin.txt", "customer.txt", "order.txt", "invoice.txt",
+                                fManager, aManager, oManager, true);
                 } else {
                     std::cout << "Update failed.\n";
                 }
