@@ -68,11 +68,27 @@ void OrderManager::createOrder(const std::string& orderId, const std::string& fI
     std::cout << "Do you want to create an invoice for this order? (y/n): ";
     std::string answer = readLine("");
     if (answer == "y" || answer == "Y") {
-        std::string invId = readLine("Enter Invoice ID: ");
-        Invoice newInvoice(invId, orderId, newOrder.getLaborCost(), today, false);
-        addInvoice(newInvoice);
-        std::cout << "Invoice " << invId << " created.\n";
+    std::string invId;
+    bool valid = false;
+    while (!valid) {
+        invId = readLine("Enter Invoice ID: ");
+        // Kiểm tra trùng Invoice ID
+        bool duplicate = false;
+        for (const auto& inv : invoices) {
+            if (inv.getInvoiceID() == invId) {
+                duplicate = true;
+                std::cout << "Error: Invoice ID " << invId << " already exists. Please use a different ID.\n";
+                break;
+            }
+        }
+        if (!duplicate) {
+            valid = true;
+        }
     }
+    Invoice newInvoice(invId, orderId, newOrder.getLaborCost(), today, false);
+    addInvoice(newInvoice);
+    std::cout << "Invoice " << invId << " created.\n";
+}
 }
 
 double OrderManager::calculatePrice(const Order& o) const {
